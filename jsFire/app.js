@@ -22,10 +22,42 @@ function saveToFB(movieName) {
 function refreshUI(list) {
     var lis = '';
     for (var i = 0; i < list.length; i++) {
-        lis += '<li data-key="' + list[i].key + '">' + list[i].name + '</li>';
+        lis += '<li data-key="' + list[i].key + '">' + list[i].name + '[' + genLinks(list[i].key, list[i].name) + ' ]</li>';
     };
     document.getElementById('favMovies').innerHTML = lis;
 };
+
+function genLinks(key, mvName) {
+    var links = '';
+
+    links += '<a href="javascript:edit(\''+ key +  '\', \'' + mvName + '\')">Edit</a> |';
+    links += '<a href="javascript:del(\''+ key + '\', \'' + mvName + '\')">Delete</a>';
+
+    return links;
+}
+
+function edit(key, mvName) {
+    var movieName = prompt('Update the movie name', mvName);
+    if (movieName && movieName.length > 0) {
+        // build the FB endpoint to the item in movies collection
+        var updateMovieRef = buildEndPoint(key);
+        updateMovieRef.update({
+            name: movieName
+        });
+    }
+}
+
+function del(key, mvName) {
+    var response = confirm('Are you sure, you want to delete ' + mvName + ' ?');
+    if (response) {
+        var deleteMovieRef = buildEndPoint(key);
+        deleteMovieRef.remove();
+    }
+}
+
+function buildEndPoint(key) {
+    return new Firebase('https://blinding-heat-3067.firebaseio.com/' + key);
+}
 
 // this will get fired on inital load as well as ever there is a change in the data
 favMovies.on("value", function(snapshot) {
