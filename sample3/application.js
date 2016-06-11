@@ -18,6 +18,25 @@ var submitRecommendation = function () {
 
 };
 
+// Get the single most recent recommendation from the database and
+// update the table with its values. This is called every time the child_added
+// event is triggered on the recommendations Firebase reference, which means
+// that this will update EVEN IF you don't refresh the page. Magic.
+recommendations.limitToLast(1).on('child_added', function(childSnapshot) {
+    // Get the recommendation data from the most recent  snapshot of data
+    recommendation = childSnapshot.val();
+    console.log(recommendation);
+
+    // Update the HTML to display the recommendation text
+    $("#title").html(recommendation.title);
+    $("#presenter").html(recommendation.presenter);
+    $("#link").html(recommendation.link);
+
+    $("#link").attr("href", recommendation.link);
+
+});
+
+
 // When the window is fully loaded, call this function.
 $(window).load(function() {
 
